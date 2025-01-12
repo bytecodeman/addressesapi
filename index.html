@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .endpoint {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CRUD API Documentation</h1>
+    <p>Base URL: <code>https://cs.stcc.edu/csc114/api</code></p>
+    <p><strong>Note:</strong> All endpoints require an <code>Authorization</code> header for Basic Authentication. Please contact Tony Silvestri for the login information.</p>
+
+    <div class="endpoint">
+        <h2>1. Get All Addresses</h2>
+        <p>Fetch all addresses with optional pagination.</p>
+        <p><strong>Endpoint:</strong> <code>GET /addresses</code></p>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+            <li><code>page</code> (optional) - Page number (default: 1)</li>
+            <li><code>limit</code> (optional) - Items per page (default: 10)</li>
+        </ul>
+        <p><strong>Sample URL:</strong></p>
+        <pre><code>https://cs.stcc.edu/csc114/api/addresses?page=1&limit=5</code></pre>
+    </div>
+
+    <div class="endpoint">
+        <h2>2. Get Address by ID</h2>
+        <p>Retrieve a single address by its unique ID.</p>
+        <p><strong>Endpoint:</strong> <code>GET /addresses/:id</code></p>
+        <p><strong>Sample URL:</strong></p>
+        <pre><code>https://cs.stcc.edu/csc114/api/addresses/1</code></pre>
+    </div>
+
+    <div class="endpoint">
+        <h2>3. Create a New Address</h2>
+        <p>Add a new address record to the database.</p>
+        <p><strong>Endpoint:</strong> <code>POST /addresses</code></p>
+        <p><strong>Request Body:</strong> (JSON)</p>
+        <pre><code>
+{
+    "name": "John Doe",
+    "address": "123 Main St",
+    "city": "Springfield",
+    "state": "IL",
+    "zip": "62704"
+}
+        </code></pre>
+    </div>
+
+    <div class="endpoint">
+        <h2>4. Update an Address</h2>
+        <p>Update an existing address by its ID.</p>
+        <p><strong>Endpoint:</strong> <code>PUT /addresses/:id</code></p>
+        <p><strong>Request Body:</strong> (JSON)</p>
+        <pre><code>
+{
+    "name": "John Smith",
+    "address": "456 Elm St",
+    "city": "Columbus",
+    "state": "OH",
+    "zip": "43085"
+}
+        </code></pre>
+        <p><strong>Sample URL:</strong></p>
+        <pre><code>https://cs.stcc.edu/csc114/api/addresses/1</code></pre>
+    </div>
+
+    <div class="endpoint">
+        <h2>5. Delete an Address</h2>
+        <p>Remove an address by its ID.</p>
+        <p><strong>Endpoint:</strong> <code>DELETE /addresses/:id</code></p>
+        <p><strong>Sample URL:</strong></p>
+        <pre><code>https://cs.stcc.edu/csc114/api/addresses/1</code></pre>
+    </div>
+
+    <div class="endpoint">
+        <h2>6. Search for Addresses</h2>
+        <p>Search all fields for a specific query string.</p>
+        <p><strong>Endpoint:</strong> <code>GET /addresses/search</code></p>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+            <li><code>query</code> (required) - The string to search for</li>
+        </ul>
+        <p><strong>Sample URL:</strong></p>
+        <pre><code>https://cs.stcc.edu/csc114/api/addresses/search?query=John Main St</code></pre>
+    </div>
+
+    <div class="endpoint">
+        <h2>7. Get Address Count</h2>
+        <p>Get the total count of address records.</p>
+        <p><strong>Endpoint:</strong> <code>GET /addresses/count</code></p>
+        <p><strong>Sample URL:</strong></p>
+        <pre><code>https://cs.stcc.edu/csc114/api/addresses/count</code></pre>
+    </div>
+</body>
+</html>
