@@ -48,44 +48,46 @@ router.use((req, res, next) => {
 // Routes
 
 // Search for addresses by a keyword in any field
-router.get('/addresses/search', async (req, res) => {
-    const { query } = req.query;
+router.get("/addresses/search", async (req, res) => {
+  const { query } = req.query;
 
-    if (!query) {
-        return res.status(400).json({ error: 'Search query is required' });
-    }
+  if (!query) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
 
-    try {
-        const [rows] = await db.promise().query(
-            `SELECT id FROM addresses WHERE 
+  try {
+    const [rows] = await db.promise().query(
+      `SELECT id FROM addresses WHERE 
             name LIKE ? OR 
             address LIKE ? OR 
             city LIKE ? OR 
             state LIKE ? OR 
             zip LIKE ?`,
-            Array(5).fill(`%${query}%`)
-        );
-		
-		console.log(rows,`%${query}%` );
+      Array(5).fill(`%${query}%`)
+    );
 
-        const ids = rows.map(row => row.id);
-        res.status(200).json({ ids });
-    } catch (error) {
-        console.error('Error during search:', error);
-        res.status(500).json({ error: 'Failed to search addresses' });
-    }
+    console.log(rows, `%${query}%`);
+
+    const ids = rows.map((row) => row.id);
+    res.status(200).json({ ids });
+  } catch (error) {
+    console.error("Error during search:", error);
+    res.status(500).json({ error: "Failed to search addresses" });
+  }
 });
 
 // Get the total count of addresses
-router.get('/addresses/count', async (req, res) => {
-    try {
-        const [rows] = await db.promise().query('SELECT COUNT(*) AS count FROM addresses');
-        const count = rows[0].count;
-        res.status(200).json({ count });
-    } catch (error) {
-        console.error('Error fetching address count:', error);
-        res.status(500).json({ error: 'Failed to fetch address count' });
-    }
+router.get("/addresses/count", async (req, res) => {
+  try {
+    const [rows] = await db
+      .promise()
+      .query("SELECT COUNT(*) AS count FROM addresses");
+    const count = rows[0].count;
+    res.status(200).json({ count });
+  } catch (error) {
+    console.error("Error fetching address count:", error);
+    res.status(500).json({ error: "Failed to fetch address count" });
+  }
 });
 
 // Get all addresses (with optional pagination)
@@ -119,6 +121,21 @@ router.get("/addresses", async (req, res) => {
     console.error("Error fetching addresses:", error);
     res.status(500).json({ error: "Failed to fetch addresses" });
   }
+});
+
+router.get("/addresses/:id", (req, res) => {
+  const { id } = req.params;
+  db.query("SELECT * FROM addresses WHERE id = ?", [id], (err, results) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "Database query failed", error: err });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+    res.json(results[0]);
+  });
 });
 
 // Add a new address
