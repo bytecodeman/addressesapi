@@ -10,8 +10,16 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 
+// Middleware to normalize trailing slash
+app.use((req, res, next) => {
+  if (req.path === "/csc114/api") {
+    return res.redirect(301, "/csc114/api/");
+  }
+  next();
+});
+
 // Proxy the GitHub Pages content
-app.get("/csc114/api", async (req, res) => {
+app.get("/csc114/api/", async (req, res) => {
   try {
     // Replace this URL with your GitHub Pages URL
     const githubPageUrl = "https://bytecodeman.github.io/addressesapi/";
