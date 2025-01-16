@@ -1,120 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API Documentation</title>
     <style>
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        line-height: 1.6;
+        margin: 20px auto;
+        max-width: 800px;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+      @media all and (max-width: 800px) {
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
+          margin: 20px 2rem;
         }
-        code {
-            background-color: #f4f4f4;
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-        pre {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-        h1 {
-            color: #333;
-        }
-        .endpoint {
-            margin-bottom: 20px;
-        }
+      }
+
+      h1,
+      h2,
+      h3 {
+        color: #2c3e50;
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 5px;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      h2 {
+        font-size: 1.8em;
+        margin-top: 30px;
+        margin-bottom: 15px;
+      }
+
+      h3 {
+        font-size: 1.5em;
+        margin-top: 20px;
+      }
+
+      p {
+        margin: 10px 0;
+        line-height: 1.8;
+      }
+
+      code {
+        display: inline-block;
+        background-color: #ecf0f1;
+        color: #2c3e50;
+        padding: 5px 8px;
+        border-radius: 5px;
+        font-size: 0.95em;
+        font-family: "Courier New", Courier, monospace;
+      }
+
+      pre {
+        background-color: #ecf0f1;
+        color: #2c3e50;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+        line-height: 1.5;
+      }
+
+      ul {
+        margin: 10px 0 10px 20px;
+      }
+
+      ul ul {
+        margin-left: 20px;
+      }
+
+      .optional {
+        color: #7f8c8d;
+        font-style: italic;
+      }
     </style>
-</head>
-<body>
-    <h1>CRUD API Documentation</h1>
-    <p>Base URL: <code>https://cs.stcc.edu/csc114/api</code></p>
-    <p><strong>Note:</strong> All endpoints require an <code>Authorization</code> header for Basic Authentication. Please contact Tony Silvestri for the login information.</p>
+  </head>
+  <body>
+    <h1>Addresses REST API Documentation</h1>
+    <p>
+      This documentation describes all available Addresses REST API endpoints,
+      including optional body inputs, typical success, and failure responses.
+    </p>
 
-    <div class="endpoint">
-        <h2>1. Get All Addresses</h2>
-        <p>Fetch all addresses with optional pagination.</p>
-        <p><strong>Endpoint:</strong> <code>GET /addresses</code></p>
-        <p><strong>Query Parameters:</strong></p>
-        <ul>
-            <li><code>page</code> (optional) - Page number (default: 1)</li>
-            <li><code>limit</code> (optional) - Items per page (default: 10)</li>
-        </ul>
-        <p><strong>Sample URL:</strong></p>
-        <pre><code>https://cs.stcc.edu/csc114/api/addresses?page=1&limit=5</code></pre>
-    </div>
+    <h2>Base URL</h2>
+    <p><code>https://cs.stcc.edu/csc114/api</code></p>
+    <p>
+      <strong>Note:</strong> All endpoints require an
+      <code>Authorization</code> header for Basic Authentication. Please contact
+      Tony Silvestri for the login information.
+    </p>
 
-    <div class="endpoint">
-        <h2>2. Get Address by ID</h2>
-        <p>Retrieve a single address by its unique ID.</p>
-        <p><strong>Endpoint:</strong> <code>GET /addresses/:id</code></p>
-        <p><strong>Sample URL:</strong></p>
-        <pre><code>https://cs.stcc.edu/csc114/api/addresses/1</code></pre>
-    </div>
+    <h2>Authentication</h2>
+    <p>
+      All requests require basic authentication via the
+      <code>Authorization</code> header:
+    </p>
+    <pre><code>Authorization: Basic ????</code></pre>
+    <p>Please contact Tony Silvestri for the login information.</p>
+    <h2>Endpoints</h2>
 
-    <div class="endpoint">
-        <h2>3. Create a New Address</h2>
-        <p>Add a new address record to the database.</p>
-        <p><strong>Endpoint:</strong> <code>POST /addresses</code></p>
-        <p><strong>Request Body:</strong> (JSON)</p>
-        <pre><code>
-{
-    "name": "John Doe",
-    "address": "123 Main St",
-    "city": "Springfield",
-    "state": "IL",
-    "zip": "62704"
-}
-        </code></pre>
-    </div>
+    <h3>1. Search Addresses</h3>
+    <p><strong>GET</strong> <code>/addresses/search</code></p>
+    <ul>
+      <li>
+        <strong>Query Parameter:</strong> <code>query</code> (required) - The
+        search term.
+      </li>
+    </ul>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "ids": [1, 2, 3]
+}</code></pre>
+    <p><strong>Failure Response:</strong></p>
+    <pre><code>{
+  "error": "Search query is required"
+}</code></pre>
 
-    <div class="endpoint">
-        <h2>4. Update an Address</h2>
-        <p>Update an existing address by its ID.</p>
-        <p><strong>Endpoint:</strong> <code>PUT /addresses/:id</code></p>
-        <p><strong>Request Body:</strong> (JSON)</p>
-        <pre><code>
-{
-    "name": "John Smith",
-    "address": "456 Elm St",
-    "city": "Columbus",
-    "state": "OH",
-    "zip": "43085"
-}
-        </code></pre>
-        <p><strong>Sample URL:</strong></p>
-        <pre><code>https://cs.stcc.edu/csc114/api/addresses/1</code></pre>
-    </div>
+    <h3>2. Get Address Count</h3>
+    <p><strong>GET</strong> <code>/addresses/count</code></p>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "count": 42
+}</code></pre>
 
-    <div class="endpoint">
-        <h2>5. Delete an Address</h2>
-        <p>Remove an address by its ID.</p>
-        <p><strong>Endpoint:</strong> <code>DELETE /addresses/:id</code></p>
-        <p><strong>Sample URL:</strong></p>
-        <pre><code>https://cs.stcc.edu/csc114/api/addresses/1</code></pre>
-    </div>
+    <h3>3. Get All Addresses</h3>
+    <p><strong>GET</strong> <code>/addresses</code></p>
+    <ul>
+      <li><strong>Query Parameters:</strong></li>
+      <ul>
+        <li><code>page</code> (optional, default: 1) - The page number.</li>
+        <li>
+          <code>limit</code> (optional, default: 10) - Number of records per
+          page.
+        </li>
+      </ul>
+    </ul>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "data": [
+    { "id": 1, "name": "John Doe", "address": "123 Main St", "city": "Springfield", "state": "IL", "zip": "62701" }
+  ],
+  "metadata": {
+    "totalRecords": 42,
+    "totalPages": 5,
+    "currentPage": 1,
+    "limit": 10
+  }
+}</code></pre>
 
-    <div class="endpoint">
-        <h2>6. Search for Addresses</h2>
-        <p>Search all fields for a specific query string.</p>
-        <p><strong>Endpoint:</strong> <code>GET /addresses/search</code></p>
-        <p><strong>Query Parameters:</strong></p>
-        <ul>
-            <li><code>query</code> (required) - The string to search for</li>
-        </ul>
-        <p><strong>Sample URL:</strong></p>
-        <pre><code>https://cs.stcc.edu/csc114/api/addresses/search?query=John Main St</code></pre>
-    </div>
+    <h3>4. Get Address by ID</h3>
+    <p><strong>GET</strong> <code>/addresses/:id</code></p>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "id": 1,
+  "name": "John Doe",
+  "address": "123 Main St",
+  "city": "Springfield",
+  "state": "IL",
+  "zip": "62701"
+}</code></pre>
+    <p><strong>Failure Response:</strong></p>
+    <pre><code>{
+  "message": "Record not found"
+}</code></pre>
 
-    <div class="endpoint">
-        <h2>7. Get Address Count</h2>
-        <p>Get the total count of address records.</p>
-        <p><strong>Endpoint:</strong> <code>GET /addresses/count</code></p>
-        <p><strong>Sample URL:</strong></p>
-        <pre><code>https://cs.stcc.edu/csc114/api/addresses/count</code></pre>
-    </div>
-</body>
+    <h3>5. Add Address</h3>
+    <p><strong>POST</strong> <code>/addresses</code></p>
+    <p><strong>Request Body:</strong></p>
+    <pre><code>{
+  "name": "John Doe",
+  "address": "123 Main St",
+  "city": "Springfield",
+  "state": "IL",
+  "zip": "62701"
+}</code></pre>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "message": "Address added successfully",
+  "addressId": 1
+}</code></pre>
+    <p><strong>Failure Response:</strong></p>
+    <pre><code>{
+  "error": "All fields are required"
+}</code></pre>
+
+    <h3>6. Update Address</h3>
+    <p><strong>PUT</strong> <code>/addresses/:id</code></p>
+    <p><strong>Request Body:</strong> (same as <strong>Add Address</strong>)</p>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "message": "Address updated successfully"
+}</code></pre>
+
+    <h3>7. Partially Update Address</h3>
+    <p><strong>PATCH</strong> <code>/addresses/:id</code></p>
+    <p><strong>Request Body:</strong> (include only fields to update)</p>
+    <pre><code>{
+  "city": "New Springfield"
+}</code></pre>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "message": "Address updated successfully"
+}</code></pre>
+    <p><strong>Failure Response:</strong></p>
+    <pre><code>{
+  "error": "No valid fields to update"
+}</code></pre>
+
+    <h3>8. Delete Address</h3>
+    <p><strong>DELETE</strong> <code>/addresses/:id</code></p>
+    <p><strong>Success Response:</strong></p>
+    <pre><code>{
+  "message": "Address deleted successfully"
+}</code></pre>
+    <p><strong>Failure Response:</strong></p>
+    <pre><code>{
+  "error": "Address not found"
+}</code></pre>
+  </body>
 </html>

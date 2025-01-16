@@ -86,8 +86,6 @@ router.get("/addresses/search", async (req, res) => {
       Array(5).fill(`%${query}%`)
     );
 
-    console.log(rows, `%${query}%`);
-
     const ids = rows.map((row) => row.id);
     res.status(200).json({ ids });
   } catch (error) {
