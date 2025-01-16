@@ -1,5 +1,6 @@
 const express = require("express");
 const mysql = require("mysql2");
+const profanity = require("./profanity");
 const router = express.Router();
 
 // Connect to MySQL
@@ -19,6 +20,27 @@ db.connect((err) => {
     console.log("Connected to MySQL database.");
   }
 });
+
+// Profanity-checking middleware
+const profanityMiddleware = (req, res, next) => {
+  const fieldsToCheck = ["name", "address", "city", "state", "zip"];
+  const profaneFields = [];
+
+  for (const field of fieldsToCheck) {
+    if (req.body[field] && profanity.containsProfanity(req.body[field])) {
+      profaneFields.push(field);
+    }
+  }
+
+  if (profaneFields.length > 0) {
+    return res.status(400).json({
+      error: "Profane content detected in fields",
+      fields: profaneFields,
+    });
+  }
+
+  next();
+};
 
 // Middleware for basic authentication
 router.use((req, res, next) => {
@@ -137,7 +159,7 @@ router.get("/addresses/:id", (req, res) => {
 });
 
 // Add a new address
-router.post("/addresses", async (req, res) => {
+router.post("/addresses", profanityMiddleware, async (req, res) => {
   const { name, address, city, state, zip } = req.body;
 
   if (!name || !address || !city || !state || !zip) {
@@ -162,7 +184,7 @@ router.post("/addresses", async (req, res) => {
 });
 
 // Update an address by ID
-router.put("/addresses/:id", async (req, res) => {
+router.put("/addresses/:id", profanityMiddleware, async (req, res) => {
   const { id } = req.params;
   const { name, address, city, state, zip } = req.body;
 
@@ -190,7 +212,7 @@ router.put("/addresses/:id", async (req, res) => {
 });
 
 // PATCH endpoint for partial updates
-router.patch("/addresses/:id", async (req, res) => {
+router.patch("/addresses/:id", profanityMiddleware, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
