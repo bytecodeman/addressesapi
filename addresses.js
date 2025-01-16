@@ -1,7 +1,5 @@
 const express = require("express");
 const mysql = require("mysql2");
-
-// Create a router
 const router = express.Router();
 
 // Connect to MySQL
@@ -183,6 +181,57 @@ router.put("/addresses/:id", async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Address not found" });
     }
+
+    res.status(200).json({ message: "Address updated successfully" });
+  } catch (error) {
+    console.error("Error updating address:", error);
+    res.status(500).json({ error: "Failed to update address" });
+  }
+});
+
+// PATCH endpoint for partial updates
+router.patch("/addresses/:id", async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: "ID parameter is required" });
+  }
+
+  if (!updates || Object.keys(updates).length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Request body must contain fields to update" });
+  }
+
+  const allowedFields = ["name", "address", "city", "state", "zip"];
+
+  // Filter the updates to only include allowed fields
+  const validUpdates = Object.keys(updates).filter((field) =>
+    allowedFields.includes(field)
+  );
+  if (validUpdates.length === 0) {
+    return res.status(400).json({ error: "No valid fields to update" });
+  }
+
+  try {
+    // Validate ID exists in the database
+    const [existingRows] = await db
+      .promise()
+      .query("SELECT * FROM addresses WHERE id = ?", [id]);
+    if (existingRows.length === 0) {
+      return res.status(404).json({ error: "Address not found" });
+    }
+
+    // Build the SQL query dynamically
+    const setClause = validUpdates.map((field) => `${field} = ?`).join(", ");
+    const values = validUpdates.map((field) => updates[field]);
+
+    // Add the ID at the end for the WHERE clause
+    values.push(id);
+
+    const query = `UPDATE addresses SET ${setClause} WHERE id = ?`;
+    await db.promise().query(query, values);
 
     res.status(200).json({ message: "Address updated successfully" });
   } catch (error) {
