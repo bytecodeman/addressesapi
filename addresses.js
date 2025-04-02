@@ -3,21 +3,25 @@ const mysql = require("mysql2");
 const profanity = require("./profanity");
 const router = express.Router();
 
-// Connect to MySQL
-const db = mysql.createConnection({
+// Create a MySQL Connection Pool
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  database: process.env.DB_DATABASE,
+  waitForConnections: true,
+  connectionLimit: 10, // Maximum number of connections in the pool
+  queueLimit: 0,
 });
 
 // Test database connection
-db.connect((err) => {
+pool.getConnection((err, connection) => {
   if (err) {
     console.error("Failed to connect to database:", err);
   } else {
     console.log("Connected to MySQL database.");
+    connection.release(); // Release the connection back to the pool
   }
 });
 
@@ -76,7 +80,7 @@ router.get("/addresses/search", async (req, res) => {
   }
 
   try {
-    const [rows] = await db.promise().query(
+    const [rows] = await pool.promise().query(
       `SELECT id FROM addresses WHERE 
             name LIKE ? OR 
             address LIKE ? OR 
@@ -97,7 +101,7 @@ router.get("/addresses/search", async (req, res) => {
 // Get the total count of addresses
 router.get("/addresses/count", async (req, res) => {
   try {
-    const [rows] = await db
+    const [rows] = await pool
       .promise()
       .query("SELECT COUNT(*) AS count FROM addresses");
     const count = rows[0].count;
@@ -115,12 +119,12 @@ router.get("/addresses", async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
-    const [countResult] = await db
+    const [countResult] = await pool
       .promise()
       .query("SELECT COUNT(*) AS total FROM addresses");
     const totalRecords = countResult[0].total;
 
-    const [rows] = await db
+    const [rows] = await pool
       .promise()
       .query("SELECT * FROM addresses LIMIT ? OFFSET ?", [limit, offset]);
 
@@ -136,14 +140,19 @@ router.get("/addresses", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching addresses:", error);
+    console.error(
+      "Error fetching addresses:",
+      error,
+      error.message,
+      error.stack
+    );
     res.status(500).json({ error: "Failed to fetch addresses" });
   }
 });
 
 router.get("/addresses/:id", (req, res) => {
   const { id } = req.params;
-  db.query("SELECT * FROM addresses WHERE id = ?", [id], (err, results) => {
+  pool.query("SELECT * FROM addresses WHERE id = ?", [id], (err, results) => {
     if (err) {
       return res
         .status(500)
@@ -165,7 +174,7 @@ router.post("/addresses", profanityMiddleware, async (req, res) => {
   }
 
   try {
-    const [result] = await db
+    const [result] = await pool
       .promise()
       .query(
         "INSERT INTO addresses (name, address, city, state, zip, created_at) VALUES (?, ?, ?, ?, ?, NOW())",
@@ -191,7 +200,7 @@ router.put("/addresses/:id", profanityMiddleware, async (req, res) => {
   }
 
   try {
-    const [result] = await db
+    const [result] = await pool
       .promise()
       .query(
         "UPDATE addresses SET name = ?, address = ?, city = ?, state = ?, zip = ? WHERE id = ?",
@@ -236,7 +245,7 @@ router.patch("/addresses/:id", profanityMiddleware, async (req, res) => {
 
   try {
     // Validate ID exists in the database
-    const [existingRows] = await db
+    const [existingRows] = await pool
       .promise()
       .query("SELECT * FROM addresses WHERE id = ?", [id]);
     if (existingRows.length === 0) {
@@ -251,7 +260,7 @@ router.patch("/addresses/:id", profanityMiddleware, async (req, res) => {
     values.push(id);
 
     const query = `UPDATE addresses SET ${setClause} WHERE id = ?`;
-    await db.promise().query(query, values);
+    await pool.promise().query(query, values);
 
     res.status(200).json({ message: "Address updated successfully" });
   } catch (error) {
@@ -265,7 +274,7 @@ router.delete("/addresses/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [result] = await db
+    const [result] = await pool
       .promise()
       .query("DELETE FROM addresses WHERE id = ?", [id]);
 
