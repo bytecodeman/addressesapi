@@ -126,7 +126,10 @@ router.get("/addresses", async (req, res) => {
 
     const [rows] = await pool
       .promise()
-      .query("SELECT * FROM addresses LIMIT ? OFFSET ?", [limit, offset]);
+      .query("SELECT * FROM addresses ORDER BY id LIMIT ? OFFSET ?", [
+        limit,
+        offset,
+      ]);
 
     const totalPages = Math.ceil(totalRecords / limit);
 
@@ -152,17 +155,21 @@ router.get("/addresses", async (req, res) => {
 
 router.get("/addresses/:id", (req, res) => {
   const { id } = req.params;
-  pool.query("SELECT * FROM addresses WHERE id = ?", [id], (err, results) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ message: "Database query failed", error: err });
+  pool.query(
+    "SELECT * from (Select *, row_number() over (Order By Id) as recordNo FROM addresses) As A WHERE A.id = ?",
+    [id],
+    (err, results) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "Database query failed", error: err });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Record not found" });
+      }
+      res.json(results[0]);
     }
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Record not found" });
-    }
-    res.json(results[0]);
-  });
+  );
 });
 
 // Add a new address

@@ -130,7 +130,7 @@
   "count": 42
 }</code></pre>
 
-    <h3>3. Get All Addresses</h3>
+    <h3>3. Get Addresses</h3>
     <p><strong>GET</strong> <code>/addresses</code></p>
     <ul>
       <li><strong>Query Parameters:</strong></li>
@@ -157,14 +157,17 @@
 
     <h3>4. Get Address by ID</h3>
     <p><strong>GET</strong> <code>/addresses/:id</code></p>
-    <p><strong>Success Response:</strong></p>
+    <p>
+      <strong>Success Response (note the recordNo is returned as well):</strong>
+    </p>
     <pre><code>{
   "id": 1,
   "name": "John Doe",
   "address": "123 Main St",
   "city": "Springfield",
   "state": "IL",
-  "zip": "62701"
+  "zip": "62701",
+  "recordNo: 123"
 }</code></pre>
     <p><strong>Failure Response:</strong></p>
     <pre><code>{
