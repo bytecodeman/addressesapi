@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Address List</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="container py-4">
+    <h1 class="mb-4">Address List</h1>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <% addresses.forEach(addr => { %>
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="field card-title name fw-bold"><%= addr.name %></h5>
+            <div class="field">
+              <strong>Street:</strong>
+              <span class="street"><%= addr.address %></span>
+            </div>
+            <div class="field">
+              <strong>City:</strong> <span class="city"><%= addr.city %></span>
+            </div>
+            <div class="field">
+              <strong>State:</strong
+              ><span class="state"><%= addr.state %></span>
+            </div>
+            <div class="field">
+              <strong>ZIP:</strong> <span class="zip"><%= addr.zip %></span>
+            </div>
+          </div>
+          <div class="card-footer text-muted">
+            ID: <span class="id"><%= addr.id %></span>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </body>
+</html>

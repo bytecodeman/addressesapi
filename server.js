@@ -6,6 +6,7 @@ const addressesRouter = require("./addresses");
 
 // Create Express app
 const app = express();
+app.set("view engine", "ejs");
 
 // Middleware
 app.use(bodyParser.json());

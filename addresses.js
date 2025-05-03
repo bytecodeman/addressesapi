@@ -48,6 +48,11 @@ const profanityMiddleware = (req, res, next) => {
 
 // Middleware for basic authentication
 router.use((req, res, next) => {
+  const publicPaths = ["/webscrapepage"];
+  if (publicPaths.includes(req.path)) {
+    return next(); // Skip authentication for public paths
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ error: "Authorization header is required" });
@@ -293,6 +298,23 @@ router.delete("/addresses/:id", async (req, res) => {
   } catch (error) {
     console.error("Error deleting address:", error);
     res.status(500).json({ error: "Failed to delete address" });
+  }
+});
+
+router.get("/webscrapepage", async (req, res) => {
+  try {
+    const [rows] = await pool
+      .promise()
+      .query("SELECT * FROM addresses ORDER BY id");
+    res.render("index", { addresses: rows });
+  } catch (error) {
+    console.error(
+      "Error fetching addresses:",
+      error,
+      error.message,
+      error.stack
+    );
+    res.status(500).send("Failed to fetch addresses " + error.message);
   }
 });
 
